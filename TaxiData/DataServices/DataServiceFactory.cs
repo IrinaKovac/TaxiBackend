@@ -26,7 +26,7 @@ namespace TaxiData.DataServices
             AzureInterface.AzureTableCRUD<AzureInterface.Entities.RideRating> driverRatingStorageWrapper
         ) 
         {
-            var userDto = new UserDTO();
+            /*var userDto = new UserDTO();
             AuthDataService = new AuthDataService(
                 userStorageWrapper,
                 userDto,
@@ -49,6 +49,35 @@ namespace TaxiData.DataServices
                     stateManager
                 ),
                 stateManager
+            );*/
+
+            // Kreiramo instancu DriverDataService prije AuthDataService
+            var driverDto = new DriverDTO();
+            DriverDataService = new DriverDataService(
+                driverStorageWrapper,
+                driverDto,
+                new DataImplementations.Synchronizer<Driver, Models.UserTypes.Driver>(
+                    driverStorageWrapper,
+                    typeof(Driver).Name,
+                    driverDto,
+                    stateManager
+                ),
+                stateManager
+            );
+
+            // Prosljeđujemo instancu DriverDataService u konstruktor AuthDataService
+            var userDto = new UserDTO();
+            AuthDataService = new AuthDataService(
+                userStorageWrapper,
+                userDto,
+                new DataImplementations.Synchronizer<User, Models.Auth.UserProfile>(
+                    userStorageWrapper,
+                    typeof(UserProfile).Name,
+                    userDto,
+                    stateManager
+                ),
+                stateManager,
+                DriverDataService // Prosljeđivanje instance
             );
 
             var rideDto = new RideDTO();

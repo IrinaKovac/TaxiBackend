@@ -225,6 +225,11 @@ namespace TaxiData
             return await dataServiceFactory.DriverRatingDataService.GetAverageRatingForDriver(driverEmail);
         }
 
+        public async Task<Driver> UpdateDriverProfile(UpdateUserProfileRequest request, string partitionKey, string rowKey)
+        {
+            return await dataServiceFactory.DriverDataService.UpdateDriverProfile(request, partitionKey, rowKey);
+        }
+
         #endregion
     }
 }

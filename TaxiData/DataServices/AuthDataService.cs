@@ -1,6 +1,7 @@
 ﻿using AzureInterface;
 using AzureInterface.DTO;
 using AzureInterface.Entities;
+using Contracts.Database;
 using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Collections;
 using Models.Auth;
@@ -15,14 +16,21 @@ namespace TaxiData.DataServices
 {
     internal class AuthDataService : BaseDataService<Models.Auth.UserProfile, AzureInterface.Entities.User>, Contracts.Database.IAuthDataService
     {
+
+        // 1. Dodaj polje za DriverDataService instancu
+        private readonly DriverDataService _driverDataService;
+
         public AuthDataService(
             AzureTableCRUD<User> storageWrapper,
             IDTOConverter<User, UserProfile> converter,
             Synchronizer<User, UserProfile> synchronizer,
-            IReliableStateManager stateManager
+            IReliableStateManager stateManager,
+            DriverDataService driverDataService
         )
             : base(storageWrapper, converter, synchronizer, stateManager)
-        {}
+        {
+            _driverDataService = driverDataService;
+        }
 
         public async Task<UserProfile> UpdateUserProfile(UpdateUserProfileRequest request, string partitionKey, string rowKey)
         {
@@ -61,7 +69,23 @@ namespace TaxiData.DataServices
                 existing.Value.Fullname = request.Fullname;
             }
 
+            if (!string.IsNullOrEmpty(request.DateOfBirth))
+            {
+                DateTime dateOfBirth;
+                if (DateTime.TryParse(request.DateOfBirth, out dateOfBirth))
+                {
+                    existing.Value.DateOfBirth = dateOfBirth;
+                }
+            }
+
             var updated = await dict.TryUpdateAsync(txWrapper.transaction, key, existing.Value, existing.Value);
+
+            // 4. Koristi instancu _driverDataService za pozivanje metode UpdateDriverProfile
+            if (partitionKey == UserType.DRIVER.ToString() && updated)
+            {
+                // Ovde pozivamo metodu koja ažurira Driver tabelu
+                await _driverDataService.UpdateDriverProfile(request, partitionKey, rowKey);
+            }
 
             return updated ? existing.Value : null;
         }

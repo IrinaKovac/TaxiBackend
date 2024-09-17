@@ -44,9 +44,11 @@ namespace TaxiData.DataServices
         {
             await synchronizer.SyncDictWithAzureTable();
         }
+
         protected async Task<IReliableDictionary<string, T1>> GetReliableDictionary()
         {
             return await stateManager.GetOrAddAsync<IReliableDictionary<string, T1>>(typeof(T1).Name);
         }
+
     }
 }

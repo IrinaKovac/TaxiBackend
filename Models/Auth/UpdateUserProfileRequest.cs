@@ -24,5 +24,8 @@ namespace Models.Auth
 
         [DataMember]
         public string? ImagePath { get; set; }
+
+        [DataMember]
+        public string? DateOfBirth { get; set; }
     }
 }

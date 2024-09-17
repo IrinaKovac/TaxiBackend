@@ -52,7 +52,9 @@ namespace BussinesLogic.Implementations
 
         public async Task<IEnumerable<Ride>> GetAllRides()
         {
-            return await dbService.GetRides(default);
+            // return await dbService.GetRides(default);
+            var allRides = await dbService.GetRides(default);
+            return allRides.OrderBy(ride => ride.CreatedAtTimestamp);
         }
 
         public async Task<IEnumerable<Ride>> GetNewRides()

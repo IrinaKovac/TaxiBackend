@@ -59,7 +59,7 @@ namespace TaxiWeb.Controllers
                 {
                     Body = $"Your status on TaxiWeb application has been changed to {updateData.Status.ToString()}",
                     // TO DO: Change to driver's email
-                    EmailTo = "acastrauss@hotmail.com",
+                    EmailTo = "irinakovac01@gmail.com",
                     Subject = "TaxiWeb status update"
                 });
             }

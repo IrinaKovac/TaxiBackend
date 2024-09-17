@@ -144,7 +144,9 @@ namespace BussinesLogic
 
         public async Task<IEnumerable<Ride>> GetUsersRides(string userEmail, UserType userType)
         {
-            return await rideLogic.GetUsersRides(userEmail, userType);
+            //return await rideLogic.GetUsersRides(userEmail, userType);
+            var allRides = await rideLogic.GetUsersRides(userEmail, userType);
+            return allRides.OrderBy(ride => ride.CreatedAtTimestamp);
         }
 
         public async Task<IEnumerable<Ride>> GetAllRides()

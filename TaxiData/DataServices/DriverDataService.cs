@@ -23,6 +23,7 @@ namespace TaxiData.DataServices
         ) : base(storageWrapper, converter, synchronizer, stateManager)
         {}
 
+
         public async Task<DriverStatus> GetDriverStatus(string driverEmail)
         {
             var dict = await GetReliableDictionary();
@@ -51,6 +52,57 @@ namespace TaxiData.DataServices
             existingDriver.Value.Status = status;
             var result = await dict.TryUpdateAsync(txWrapper.transaction, $"{UserType.DRIVER}{driverEmail}", existingDriver.Value, existingDriver.Value);
             return result;
+        }
+
+        public async Task<Driver> UpdateDriverProfile(UpdateUserProfileRequest request, string partitionKey, string rowKey)
+        {
+            var dict = await GetReliableDictionary();
+            using var txWrapper = new StateManagerTransactionWrapper(stateManager.CreateTransaction());
+            var key = $"{partitionKey}{rowKey}";
+            var existing = await dict.TryGetValueAsync(txWrapper.transaction, key);
+
+            if (!existing.HasValue)
+            {
+                return null;
+            }
+
+            if (request.Password != null)
+            {
+                existing.Value.Password = request.Password;
+            }
+
+            if (request.Username != null)
+            {
+                existing.Value.Username = request.Username;
+            }
+
+            if (request.Address != null)
+            {
+                existing.Value.Address = request.Address;
+            }
+
+            if (request.ImagePath != null)
+            {
+                existing.Value.ImagePath = request.ImagePath;
+            }
+
+            if (request.Fullname != null)
+            {
+                existing.Value.Fullname = request.Fullname;
+            }
+
+            if (!string.IsNullOrEmpty(request.DateOfBirth))
+            {
+                DateTime dateOfBirth;
+                if (DateTime.TryParse(request.DateOfBirth, out dateOfBirth))
+                {
+                    existing.Value.DateOfBirth = dateOfBirth;
+                }
+            }
+
+            var updated = await dict.TryUpdateAsync(txWrapper.transaction, key, existing.Value, existing.Value);
+
+            return updated ? existing.Value : null;
         }
 
         public async Task<IEnumerable<Models.UserTypes.Driver>> ListAllDrivers()

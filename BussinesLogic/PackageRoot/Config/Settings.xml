@@ -3,8 +3,8 @@
   
   <Section Name="GmailConfig">
 
-	  <Parameter Name="GmailSendFrom" Value="acastrauss@gmail.com" />
-	  <Parameter Name="GmailAppPassword" Value="wshkxiammcyyhjhv" />
+	  <Parameter Name="GmailSendFrom" Value="irinakovac01@gmail.com" />
+	  <Parameter Name="GmailAppPassword" Value="jhwruoynapzlxtqv" />
   </Section>
   
 </Settings>
